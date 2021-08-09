@@ -3,7 +3,7 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 
 from config import TOKEN
-
+from repo import get_data_from_db
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
@@ -19,9 +19,13 @@ async def process_start_command(message: types.Message):
                         "")
 
 
-@dp.message_handler(commands=['help'])
+@dp.message_handler(commands=['sos'])
 async def process_help_command(message: types.Message):
-    await message.reply("Напиши мне что-нибудь, и я отпрпавлю этот текст тебе в ответ!")
+    print(message.from_user.username)
+    data = get_data_from_db('@' + message.from_user.username)
+    for user_id in data[3]:
+        await bot.send_message(user_id, f'{data[2]} в опастности!')
+    await bot.send_message(message.from_user.id, 'Вы отправили сообщение об опастности своим контактам')
 
 
 @dp.message_handler()
